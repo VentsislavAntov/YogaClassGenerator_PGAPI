@@ -1,51 +1,91 @@
-const express = require('express')
-const app = express()
-const port = 3001
+let express = require('express');
+let bodyParser = require('body-parser');
+let morgan = require('morgan');
+let pg = require('pg');
+const PORT = 3001;
 
-const exercise_model = require('./exercise_model')
+let pool = new pg.Pool({
+    port: 5432,
+    user: 'postgres',
+    password: 'postgres',
+    host: 'localhost',
+    database: 'exercises',
+    max: 15
+});
 
-app.use(express.json())
+// pool.connect((err, db, done) => {
+//     if(err){
+//         return console.log(err);
+//     }
+//     else{
+//         db.query('SELECT * from exercise', (err, table) => {
+//             if (err){
+//                 return console.log(err)
+//             }
+//             else{
+//                 console.log(table.rows)
+//             }
+//         })
+//     }
+// })
+
+//        pool.query("SELECT * from exercise WHERE exercisetype LIKE $1 AND difficulty LIKE $2", [type, difficulty], (error, results) => {
+
+let app = express();
+
+// const exercise_model = require('./exercise_model')
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}));
+
+app.use(morgan('dev'));
+
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers');
+    res.setHeader('Access-Control-Allow-Headers',  'Origin, X-Requested-With, Content-Type, Accept');
     next();
 });
 
-// app.get('/', (req, res) => {
-//     res.status(200).send('Success');
-// })
+app.post('/api/get-exercise', function(request, response){
 
-app.get('/', (req, res) => {
-    exercise_model.getExercises()
-        .then(response => {
-            res.status(200).send(response);
+    pool.connect((err, db, done) => {
+    if(err){
+        return response.status(400).send(err);
+    }
+    else{
+        db.query('SELECT * from exercise', (err, table) => {
+            done();
+            if (err){
+                return response.status(400).send(err);
+            }
+            else{
+                console.log(table.rows)
+                response.status(201).send(table.rows);
+            }
         })
-        .catch(error => {
-            res.status(500).send(error);
-        })
+    }
+})
+});
+
+app.get('/api/exercises', function(request,response){
+    pool.connect(function(err,db,done){
+        if (err){
+            return response.status(400).send(err);
+        }
+        else{
+            db.query('SELECT * from exercise', (err, table) => {
+                done();
+                if (err){
+                    return response.status(400).send(err);
+                }
+                else{
+                    console.log(table.rows)
+                    response.status(200).send(table.rows);
+                }
+            })
+        }
+    })
 })
 
-app.listen(port, () => {
-    console.log(`App running on port ${port}.`)
-})
 
-
-// const {Client} = require('pg');
-// const client = new Client({
-//     user: 'postgres',
-//     password: 'postgres',
-//     host: 'localhost',
-//     port: 5432,
-//     database: 'exercises',
-//     max: 15
-// });
-//
-// function GetExercise(props) {
-//     client.connect()
-//         .then(() => console.log("Connected successfully"))
-//         .then(() => client.query("SELECT * from exercise WHERE englishname LIKE $1 AND sanskritname LIKE $2", props))
-//         .then(results => console.table(results.rows))
-//         .catch(e => console.log(e))
-//         .finally(() => client.end())
-// }
+app.listen(PORT, () => console.log('Listening on port ' + PORT))
