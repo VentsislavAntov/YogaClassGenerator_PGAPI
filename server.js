@@ -31,43 +31,39 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(morgan('dev'));
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.setHeader('Access-Control-Allow-Headers',  'Origin, X-Requested-With, Content-Type, Accept');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     next();
 });
 
 //Post
-app.post('/api/get-exercise', function(request, response){
+app.post('/api/get-exercise', function (request, response) {
     pool.connect((err, db, done) => {
-    if(err){
-        return response.status(400).send(err);
-    }
-    else{
-        db.query('SELECT * from exercise', (err, table) => {
-            done();
-            if (err){
-                return response.status(400).send(err);
-            }
-            else{
-                response.status(201).send(table.rows);
-            }
-        })
-    }
-})
+        if (err) {
+            return response.status(400).send(err);
+        } else {
+            db.query('SELECT * from exercise', (err, table) => {
+                done();
+                if (err) {
+                    return response.status(400).send(err);
+                } else {
+                    response.status(201).send(table.rows);
+                }
+            })
+        }
+    })
 });
 
 //get
-app.get('/api/exercises', function(request, response){
-    pool.connect(function(err,db,done){
-        if (err){
+app.get('/api/exercises', function (request, response) {
+    pool.connect(function (err, db, done) {
+        if (err) {
             return response.status(400).send(err);
-        }
-        else{
+        } else {
             db.query('SELECT * from exercise', (err, table) => {
                 done();
-                if (err){
+                if (err) {
                     return response.status(400).send(err);
-                }
-                else{
+                } else {
                     response.status(200).send(table.rows);
                 }
             })
