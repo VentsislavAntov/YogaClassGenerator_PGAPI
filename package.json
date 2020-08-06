@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "postinstall": "react-scripts build",
+    "heroku-postbuild": "npm install",
     "start": "node server.js"
   },
   "engines": {
