@@ -16,10 +16,10 @@ const port = process.env.PORT || 3001;
 //Note that there is a maximum number of client connections set but this can be changed easily. Default should be 10 if not set
 let pool = new pg.Pool({
     port: 5432,
-    user: 'postgres',
-    password: 'postgres',
-    host: 'localhost',
-    database: 'exercises',
+    user: 'whwcbqwhlgusyw',
+    password: '8f03af13039a5a432baac5e7731924228aba95abbfaa8256c98c6ba560055e1e',
+    host: 'ec2-34-193-117-204.compute-1.amazonaws.com',
+    database: 'd34lq4u0aaoah8',
     max: 20
 });
 
