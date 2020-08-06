@@ -10,7 +10,7 @@ let express = require('express');
 let bodyParser = require('body-parser');
 let morgan = require('morgan');
 let pg = require('pg');
-const PORT = 3001;
+const port = process.env.PORT || 3001;
 
 //Pools will use environment variables for connection information - the table on pgAdmin is called exercises.
 //Note that there is a maximum number of client connections set but this can be changed easily. Default should be 10 if not set
@@ -72,4 +72,4 @@ app.get('/api/exercises', function (request, response) {
 });
 
 //To display that it is listening
-app.listen(PORT, () => console.log('Listening on port: ' + PORT));
+app.listen(port, '0.0.0.0', () => console.log('Listening ...'));
